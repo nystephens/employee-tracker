@@ -1,22 +1,22 @@
--- Department
+DROP TABLE IF EXISTS department;
+DROP TABLE IF EXISTS roles;
+DROP TABLE IF EXISTS employees;
 
--- id: INT PRIMARY KEY
-
--- name: VARCHAR(30) to hold department name
-
-
-
--- Role
-
--- id: INT PRIMARY KEY
-
--- title: VARCHAR(30) to hold role title
-
--- salary: DECIMAL to hold role salary
-
--- department_id: INT to hold reference to department role belongs to
+-- Departments
+CREATE TABLE departments (
+    id: INT PRIMARY KEY,
+    name: VARCHAR(30) NOT NULL
+);
 
 
+-- Roles
+CREATE TABLE roles(
+    id: INT PRIMARY KEY,
+    title: VARCHAR(30) NOT NULL,
+    salary: DECIMAL(p,s),
+    department_id: INTEGER UNSIGNED,
+    CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
+);
 
 -- Employee
 
