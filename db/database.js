@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const msyql = require('mysql2');
+const mysql = require('mysql2');
 const format = require('console.table');
 // this file will contain the database queries
 
@@ -14,8 +14,8 @@ const connection = mysql.createConnection({
 
 
 
-// // this js file will house the connection.query functions for the app
-// // use console.table to format results
+// this js file will house the connection.query functions for the app
+// use console.table to format results
 
 function getEmployeeByRoles() {
     connection.query(
