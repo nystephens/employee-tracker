@@ -82,6 +82,7 @@ function viewAllDepartments() {
     );
 };
 
+
 function viewAllRoles() {
     connection.query(
         `SELECT * FROM roles`,
@@ -102,8 +103,12 @@ function viewAllEmployees() {
     );
 };
 
+
 module.exports = {
     masterswitch: masterswitch,
-    viewAllEmployees: viewAllEmployees
+    viewAllEmployees: viewAllEmployees,
+    viewAllRoles: viewAllRoles,
+    viewAllDepartments: viewAllDepartments,
+
 };
 

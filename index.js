@@ -80,16 +80,6 @@ const updateRoleQuest = [
     }
 ];
 
-// start inquirer prompt
-function prompUser() {
-    inquirer
-        .prompt(masterQuestion)
-        .then(answers => {
-            db.masterswitch(answers);
-        })
-        .catch(error => console.log(error));
-};
-
 
 function addDepartment() {
 
@@ -158,4 +148,15 @@ function updateEmpRole() {
 
 };
 
-prompUser();
+// start inquirer prompt
+function promptUser() {
+    inquirer
+        .prompt(masterQuestion)
+        .then(answers => {
+            // console.log(answers.masterList);
+            db.masterswitch(answers.masterList);
+        })
+        .catch(error => console.log(error));
+};
+
+promptUser();
