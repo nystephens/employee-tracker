@@ -29,48 +29,6 @@ function getEmployeeByRoles() {
 
 getEmployeeByRoles();
 
-// switch statment that has initial options as cases.  each case will contain the appropriate query for viewing table results.  if edit table options selected, then additional questions will fire.
-
-function masterswitch(answers) {
-    switch (answers) {
-        case "View All Departments":
-            viewAllDepartments();
-            break;
-
-        case "View All Roles":
-            viewAllRoles();
-            break;
-
-        case "View All Employees":
-            viewAllEmployees();
-            break;
-
-        case "Add a Department":
-            // call addDepartment();
-            break;
-
-        case "Add a Role":
-            addRole();
-            break;
-
-        case "Add an Employee":
-            // call addEmployee();
-            break;
-
-        case "Update Employee Role":
-            // call updateEmpRole();
-            break;
-
-        case "Exit Program":
-            // exit program
-            console.log("Goodbye!");
-            break;
-
-        default:
-            console.log("No option selected.");
-            break;
-    }
-};
 
 function viewAllDepartments() {
     connection.query(
@@ -93,6 +51,7 @@ function viewAllRoles() {
     );
 };
 
+
 function viewAllEmployees() {
     connection.query(
         `SELECT * FROM employees`,
@@ -104,11 +63,79 @@ function viewAllEmployees() {
 };
 
 
+function addDepartment() {
+
+};
+
+
+function addRole() {
+    // get all department names for choices
+    connection.query(
+        `SELECT * FROM departments`,
+        function (err, results) {
+            if (err) throw err;
+
+            let departmentList = results.map(department => ({
+                name: department.department_name, value: department.id
+            }));
+
+            // ask questions for new role 
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "newRoleName",
+                    message: "Please enter the name of the new role:  "
+                },
+                {
+                    type: "input",
+                    name: "newRoleSalary",
+                    message: "Please enter the salary for the new role:  "
+                },
+                {
+                    type: "list",
+                    name: "newRoleDep",
+                    message: "Please slect the new role's department.",
+                    choices: departmentList
+                }
+            ])
+                // insert new role answers into table using INSERT INTO 
+                .then(answers => {
+                    connection.query(
+                        `INSERT INTO roles SET ?`,
+                        {
+                            title: answers.newRoleName,
+                            salary: answers.newRoleSalary,
+                            department_id: answers.newRoleDep
+                        },
+                        function (err, results) {
+                            if (err) throw err;
+                            console.log("New Role Added");
+
+                            // return user to initial questions.
+                            prompUser();
+                        }
+                    );
+                })
+        }
+    );
+};
+
+
+function addEmployee() {
+
+};
+
+
+function updateEmpRole() {
+
+};
+
 module.exports = {
-    masterswitch: masterswitch,
     viewAllEmployees: viewAllEmployees,
     viewAllRoles: viewAllRoles,
     viewAllDepartments: viewAllDepartments,
-
+    addEmployee: addEmployee,
+    addRole: addRole,
+    addDepartment: addDepartment
 };
 
