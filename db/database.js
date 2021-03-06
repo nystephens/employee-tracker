@@ -19,6 +19,7 @@ const connection = mysql.createConnection({
 // use console.table to format results
 
 // not necessary just for test
+
 function getEmployeeByRoles() {
     connection.query(
         'SELECT * FROM `employee` WHERE `role_id` = 6',
@@ -28,17 +29,22 @@ function getEmployeeByRoles() {
     );
 };
 
-getEmployeeByRoles();
+// getEmployeeByRoles();
+
 
 // function to create managerList to be used in addEmployee
-// let managerList = function () {
-//     connection.query(
-//         `SELECT * FROM employees WHERE role <= 5`,
-//         function (err, results){
-//         console.table(results);
-//         }
-//     );
-// };
+let managerList = function () {
+    connection.query(
+        `SELECT * FROM employees WHERE role <= 5`,
+        function (err, results) {
+            if (err) throw err;
+            console.log(results);
+            return results;
+        }
+    );
+};
+
+
 
 
 function viewAllDepartments() {
@@ -152,7 +158,6 @@ function addRole() {
 
 
 function addEmployee() {
-    // add role copied so change to add employee functionality
     connection.query(
         // grab roleList from roles table
         `SELECT * FROM roles`,
@@ -198,7 +203,7 @@ function addEmployee() {
                             first_name: answers.empFirstName,
                             last_name: answers.empLastName,
                             role_id: answers.empRole,
-                            manager_id: answers.manager_id
+                            manager_id: answers.empManager
                         },
                         function (err, results) {
                             if (err) throw err;
@@ -215,37 +220,58 @@ function addEmployee() {
 
 
 function updateEmpRole() {
+    // need to grab list of employees to select from.
     connection.query(
-        // need to grab list of employees to select from.
-
-        // grab roleList from roles table
-        `SELECT * FROM roles`,
+        `SELECT first_name, last_name FROM employees`,
         function (err, results) {
             if (err) throw err;
-
-            let roleList = results.map(role => ({
-                name: role.title, value: role.id
+            let empList = results.map(employee => ({
+                name: employee.title, value: employee.id
             }));
 
-            // ask questions for new role 
-            inquirer.prompt([
-                {
-                    type: "list",
-                    name: "empRole",
-                    message: "Please slect the new employee's role.",
-                    choices: roleList
-                }
-            ])
-                // insert new employee answers into table using INSERT INTO 
+            // ask what employee to update using empList
+            inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        name: "empRole",
+                        message: "Please select an employee to update.",
+                        choices: empList
+                    }
+                ])
                 .then(answers => {
                     connection.query(
-                        `INSERT INTO roles SET ?`,
-                        {role_id: answers.empRole},
+                        // grab roleList from roles table
+                        `SELECT * FROM roles`,
                         function (err, results) {
                             if (err) throw err;
-                            console.log("New Role Updated!");
-                            // return user to initial questions.
-                            // promptUser();
+
+                            let roleList = results.map(role => ({
+                                name: role.title, value: role.id
+                            }));
+
+                            // ask questions for new role 
+                            inquirer.prompt([
+                                {
+                                    type: "list",
+                                    name: "empRole",
+                                    message: "Please select the new employee's role.",
+                                    choices: roleList
+                                }
+                            ])
+                                // insert new employee answers into table using INSERT INTO 
+                                .then(answers => {
+                                    connection.query(
+                                        `INSERT INTO roles SET ?`,
+                                        { role_id: answers.empRole },
+                                        function (err, results) {
+                                            if (err) throw err;
+                                            console.log("New Role Updated!");
+                                            // return user to initial questions.
+                                            // promptUser();
+                                        }
+                                    );
+                                })
                         }
                     );
                 })

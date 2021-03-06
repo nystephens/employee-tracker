@@ -61,7 +61,7 @@ function masterswitch(answers) {
             break;
 
         case "Update Employee Role":
-            // call updateEmpRole();
+            db.updateEmpRole();
             break;
 
         case "Exit Program":
@@ -88,4 +88,16 @@ function promptUser() {
         .catch(error => console.log(error));
 };
 
+// let managerList = function () {
+//     connection.query(
+//         `SELECT * FROM employees WHERE role_id <= 5`,
+//         function (err, results){
+//             if (err) throw err;
+//             console.log(results);
+//             return results;
+//         }
+//     );
+// };
+
+// managerList();
 promptUser();
