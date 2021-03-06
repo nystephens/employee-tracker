@@ -18,11 +18,12 @@ const connection = mysql.createConnection({
 // this js file will house the connection.query functions for the app
 // use console.table to format results
 
+// not necessary just for test
 function getEmployeeByRoles() {
     connection.query(
         'SELECT * FROM `employee` WHERE `role_id` = 6',
         function (err, results,) {
-            console.log(results); // results contains rows returned by server
+            console.table(results); // results contains rows returned by server
         }
     );
 };
@@ -30,12 +31,14 @@ function getEmployeeByRoles() {
 getEmployeeByRoles();
 
 // function to create managerList to be used in addEmployee
-let managerList = function(){
-    connection.query(
-        `SELECT * FROM employees WHERE role <= 5`,
-        function (err, results)
-    );
-};
+// let managerList = function () {
+//     connection.query(
+//         `SELECT * FROM employees WHERE role <= 5`,
+//         function (err, results){
+//         console.table(results);
+//         }
+//     );
+// };
 
 
 function viewAllDepartments() {
@@ -86,7 +89,7 @@ function addDepartment() {
                 {
                     department_name: answers.newDepName
                 },
-                function(err, results) {
+                function (err, results) {
                     if (err) throw err;
                     console.log("New Department Added!");
                 }
@@ -160,7 +163,7 @@ function addEmployee() {
                 name: role.title, value: role.id
             }));
 
-        // grab managerList from employees table
+            // grab managerList from employees table
 
             // ask questions for new role 
             inquirer.prompt([
@@ -213,6 +216,8 @@ function addEmployee() {
 
 function updateEmpRole() {
     connection.query(
+        // need to grab list of employees to select from.
+
         // grab roleList from roles table
         `SELECT * FROM roles`,
         function (err, results) {
@@ -225,43 +230,20 @@ function updateEmpRole() {
             // ask questions for new role 
             inquirer.prompt([
                 {
-                    type: "input",
-                    name: "empFirstName",
-                    message: "Please enter the new employee's first name:  "
-                },
-                {
-                    type: "input",
-                    name: "empLastName",
-                    message: "Please enter the new employee's last name:  "
-                },
-                {
                     type: "list",
                     name: "empRole",
                     message: "Please slect the new employee's role.",
                     choices: roleList
-                },
-                {
-                    type: "list",
-                    name: "empManager",
-                    message: "Please select the new employee's manager.",
-                    choices: managerList
                 }
             ])
                 // insert new employee answers into table using INSERT INTO 
                 .then(answers => {
                     connection.query(
                         `INSERT INTO roles SET ?`,
-                        {
-                            first_name: answers.empFirstName,
-                            last_name: answers.empLastName,
-                            role_id: answers.empRole,
-                            // need to get managerList for list choices
-                            manager_id: answers.manager_id
-                        },
+                        {role_id: answers.empRole},
                         function (err, results) {
                             if (err) throw err;
-                            console.log("New Employee Added");
-
+                            console.log("New Role Updated!");
                             // return user to initial questions.
                             // promptUser();
                         }
@@ -277,6 +259,7 @@ module.exports = {
     viewAllDepartments: viewAllDepartments,
     addEmployee: addEmployee,
     addRole: addRole,
-    addDepartment: addDepartment
+    addDepartment: addDepartment,
+    updateEmpRole: updateEmpRole
 };
 
