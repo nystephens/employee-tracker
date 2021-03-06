@@ -2,8 +2,6 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const format = require('console.table');
 
-// this file will contain the database queries
-
 // create the connection to database
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -13,10 +11,6 @@ const connection = mysql.createConnection({
     database: 'employee_tracker'
 });
 
-
-
-// this js file will house the connection.query functions for the app
-// use console.table to format results
 
 // not necessary just for test
 
@@ -106,6 +100,7 @@ function addDepartment() {
 
 function addRole() {
     // get all department names for choices
+    // STEP ONE CREATE DEPARTMENTLIST FROM DEPARTMENTS TABLE
     connection.query(
         `SELECT * FROM departments`,
         function (err, results) {
@@ -115,7 +110,7 @@ function addRole() {
                 name: department.department_name, value: department.id
             }));
 
-            // ask questions for new role 
+            // STEP TWO ask questions for new role 
             inquirer.prompt([
                 {
                     type: "input",
@@ -134,7 +129,7 @@ function addRole() {
                     choices: departmentList
                 }
             ])
-                // insert new role answers into table using INSERT INTO 
+                // STEP THREE insert new role answers into table using INSERT INTO 
                 .then(answers => {
                     connection.query(
                         `INSERT INTO roles SET ?`,
@@ -222,12 +217,26 @@ function addEmployee() {
 function updateEmpRole() {
     // need to grab list of employees to select from.
     connection.query(
-        `SELECT first_name, last_name FROM employees`,
+        `SELECT CONCAT(first_name, " ", last_name) AS full_name FROM employees`,
         function (err, results) {
             if (err) throw err;
+
+            // creates an array of objects {full_name: 'Fist Last'}
             let empList = results.map(employee => ({
-                name: employee.title, value: employee.id
+                full_name: employee.full_name
             }));
+
+            // filter to get an array of 
+            // let empFullNames = empList.filter(employee =>{
+            //     employee = employee.full_name;
+            // });
+
+            // // emplist returns an object of {first_name: 'string', last_name: "string"}  Need to get just values and combine them into one string.
+            for (let i = 0; i < empList.length; i++){
+                let empFullNames = empList[i].value;
+                
+            };
+            
 
             // ask what employee to update using empList
             inquirer
@@ -236,7 +245,7 @@ function updateEmpRole() {
                         type: "list",
                         name: "empRole",
                         message: "Please select an employee to update.",
-                        choices: empList
+                        choices: empFullNames
                     }
                 ])
                 .then(answers => {
