@@ -29,6 +29,14 @@ function getEmployeeByRoles() {
 
 getEmployeeByRoles();
 
+// function to create managerList to be used in addEmployee
+let managerList = function(){
+    connection.query(
+        `SELECT * FROM employees WHERE role <= 5`,
+        function (err, results)
+    );
+};
+
 
 function viewAllDepartments() {
     connection.query(
@@ -64,7 +72,26 @@ function viewAllEmployees() {
 
 
 function addDepartment() {
-
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                name: "newDepName",
+                message: "Please enter the name for the new department:  "
+            }
+        ])
+        .then(answers => {
+            connection.query(
+                `INSERT INTO departments SET ?`,
+                {
+                    department_name: answers.newDepName
+                },
+                function(err, results) {
+                    if (err) throw err;
+                    console.log("New Department Added!");
+                }
+            );
+        });
 };
 
 
@@ -112,7 +139,7 @@ function addRole() {
                             console.log("New Role Added");
 
                             // return user to initial questions.
-                            prompUser();
+                            // promptUser();
                         }
                     );
                 })
@@ -122,12 +149,126 @@ function addRole() {
 
 
 function addEmployee() {
+    // add role copied so change to add employee functionality
+    connection.query(
+        // grab roleList from roles table
+        `SELECT * FROM roles`,
+        function (err, results) {
+            if (err) throw err;
 
+            let roleList = results.map(role => ({
+                name: role.title, value: role.id
+            }));
+
+        // grab managerList from employees table
+
+            // ask questions for new role 
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "empFirstName",
+                    message: "Please enter the new employee's first name:  "
+                },
+                {
+                    type: "input",
+                    name: "empLastName",
+                    message: "Please enter the new employee's last name:  "
+                },
+                {
+                    type: "list",
+                    name: "empRole",
+                    message: "Please slect the new employee's role.",
+                    choices: roleList
+                },
+                {
+                    type: "list",
+                    name: "empManager",
+                    message: "Please select the new employee's manager.",
+                    choices: managerList
+                }
+            ])
+                // insert new employee answers into table using INSERT INTO 
+                .then(answers => {
+                    connection.query(
+                        `INSERT INTO roles SET ?`,
+                        {
+                            first_name: answers.empFirstName,
+                            last_name: answers.empLastName,
+                            role_id: answers.empRole,
+                            manager_id: answers.manager_id
+                        },
+                        function (err, results) {
+                            if (err) throw err;
+                            console.log("New Employee Added");
+
+                            // return user to initial questions.
+                            // promptUser();
+                        }
+                    );
+                })
+        }
+    );
 };
 
 
 function updateEmpRole() {
+    connection.query(
+        // grab roleList from roles table
+        `SELECT * FROM roles`,
+        function (err, results) {
+            if (err) throw err;
 
+            let roleList = results.map(role => ({
+                name: role.title, value: role.id
+            }));
+
+            // ask questions for new role 
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "empFirstName",
+                    message: "Please enter the new employee's first name:  "
+                },
+                {
+                    type: "input",
+                    name: "empLastName",
+                    message: "Please enter the new employee's last name:  "
+                },
+                {
+                    type: "list",
+                    name: "empRole",
+                    message: "Please slect the new employee's role.",
+                    choices: roleList
+                },
+                {
+                    type: "list",
+                    name: "empManager",
+                    message: "Please select the new employee's manager.",
+                    choices: managerList
+                }
+            ])
+                // insert new employee answers into table using INSERT INTO 
+                .then(answers => {
+                    connection.query(
+                        `INSERT INTO roles SET ?`,
+                        {
+                            first_name: answers.empFirstName,
+                            last_name: answers.empLastName,
+                            role_id: answers.empRole,
+                            // need to get managerList for list choices
+                            manager_id: answers.manager_id
+                        },
+                        function (err, results) {
+                            if (err) throw err;
+                            console.log("New Employee Added");
+
+                            // return user to initial questions.
+                            // promptUser();
+                        }
+                    );
+                })
+        }
+    );
 };
 
 module.exports = {

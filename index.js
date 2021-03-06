@@ -31,83 +31,33 @@ const masterQuestion = [
 ];
 
 
-// if the user selects an option to edit a table then ask for additional input
-
-const addDepQuest = [
-    {
-        type: "input",
-        name: "newDepName",
-        message: "Please enter the name for the new department:  "
-    }
-];
-
-const addEmployeeQuest = [
-    {
-        type: "input",
-        name: "empFirstName",
-        message: "Please enter the new employee's first name:  "
-    },
-    {
-        type: "input",
-        name: "empLastName",
-        message: "Please enter the new employee's last name:  "
-    },
-    {
-        type: "list",
-        name: "empRole",
-        message: "Please slect the new employee's role.",
-        choice: [roleList]
-    },
-    {
-        type: "input",
-        name: "empManager",
-        message: "Please enter the new employee's manager:  "
-    }
-];
-
-const updateRoleQuest = [
-    {
-        type: "list",
-        name: "selectEmployee",
-        message: "Please select an employee to update.",
-        choices: [employeeList]
-    },
-    {
-        type: "list",
-        name: "newRole",
-        message: "Please select a new role to be assigned to this employee.",
-        choices: roleList
-    }
-];
-
-
 // switch statment that has initial options as cases.  each case will contain the appropriate query for viewing table results.  if edit table options selected, then additional questions will fire.
 
 function masterswitch(answers) {
     switch (answers) {
         case "View All Departments":
-            viewAllDepartments();
-            promptUser();
+            db.viewAllDepartments();
+            // promptUser();
             break;
 
         case "View All Roles":
-            viewAllRoles();
+            db.viewAllRoles();
             break;
 
         case "View All Employees":
-            viewAllEmployees();
+            db.viewAllEmployees();
             break;
 
         case "Add a Department":
-            // call addDepartment();
+            db.addDepartment();
             break;
 
         case "Add a Role":
-            addRole();
+            db.addRole();
             break;
 
         case "Add an Employee":
-            // call addEmployee();
+            db.addEmployee();
             break;
 
         case "Update Employee Role":
@@ -132,7 +82,8 @@ function promptUser() {
         .prompt(masterQuestion)
         .then(answers => {
             // console.log(answers.masterList);
-            db.masterswitch(answers.masterList);
+            masterswitch(answers.masterList);
+            // promptUser();
         })
         .catch(error => console.log(error));
 };
