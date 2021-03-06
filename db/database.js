@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const format = require('console.table');
+
 // this file will contain the database queries
 
 // create the connection to database
@@ -30,18 +31,18 @@ getEmployeeByRoles();
 
 // switch statment that has initial options as cases.  each case will contain the appropriate query for viewing table results.  if edit table options selected, then additional questions will fire.
 
-function masterswitch() {
+function masterswitch(answers) {
     switch (answers) {
         case "View All Departments":
-            // query to view departments
+            viewAllDepartments();
             break;
 
         case "View All Roles":
-            // query to view roles
+            viewAllRoles();
             break;
 
         case "View All Employees":
-            // query to view employees
+            viewAllEmployees();
             break;
 
         case "Add a Department":
@@ -49,7 +50,7 @@ function masterswitch() {
             break;
 
         case "Add a Role":
-            // call addRole();
+            addRole();
             break;
 
         case "Add an Employee":
@@ -71,5 +72,38 @@ function masterswitch() {
     }
 };
 
-// module.exports = 
+function viewAllDepartments() {
+    connection.query(
+        `SELECT * FROM departments`,
+        function (err, results) {
+            if (err) throw err;
+            console.table(results);
+        }
+    );
+};
+
+function viewAllRoles() {
+    connection.query(
+        `SELECT * FROM roles`,
+        function (err, results) {
+            if (err) throw err;
+            console.table(results);
+        }
+    );
+};
+
+function viewAllEmployees() {
+    connection.query(
+        `SELECT * FROM employees`,
+        function (err, results) {
+            if (err) throw err;
+            console.table(results);
+        }
+    );
+};
+
+module.exports = {
+    masterswitch: masterswitch,
+    viewAllEmployees: viewAllEmployees
+};
 

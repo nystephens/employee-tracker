@@ -85,8 +85,9 @@ function prompUser() {
     inquirer
         .prompt(masterQuestion)
         .then(answers => {
-
+            db.masterswitch(answers);
         })
+        .catch(error => console.log(error));
 };
 
 
@@ -157,4 +158,4 @@ function updateEmpRole() {
 
 };
 
-addRole();
+prompUser();
