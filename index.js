@@ -217,7 +217,6 @@ function addEmployee() {
             let managerList = results.map(manager => ({
                 name: manager.first_name, value: manager.id
             }));
-            console.log(managerList);
 
             connection.query(
                 // grab roleList from roles table

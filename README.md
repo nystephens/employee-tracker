@@ -39,7 +39,7 @@ To initialize the employee_tracker database first log into your MySQL CLI by ent
 
 Created using Node.js, this application runs entirely within the command line.  To initiate the application first navigate to the correct directory in your terminal (see Installation Step 5), type the following command, and hit Enter:  “node index.js”.  When the user runs the application in their terminal they are met with a set of prompts initiated by the inquirer module that ask the user for actions to interact with thier employee database.  the options for interaction are: "View All Departments", "View All Roles", "View All Employees", "Add a Department", "Add a Role", "Add an Employee", "Update Employee Role", "Exit Program".  When the user selects a veiwing option they are presented with an ordered table with info relevant to their request.  If the user selects an option to edit the table by entering a new employee, role, department, or update an employee's role then they are asked for input regarding their addition.  Selecting "Exit Program" will terminated the connection to the database and return the user to the CLI.  After an action is completed the user is asked if they would like to take more actions.  If they choose "Yes" then they will be again prompted with all options for interaction.  If the user selects no then the connection to the database is terminated and the user returns to the CLI.
 
-To see this application in action please watch my [Demo Video]()
+To see this application in action please watch my [Demo Video](https://drive.google.com/file/d/1mc9TIf2UDI_uzq7blYf5L9QY2DDMBb3d/view)
 
 ## License
 ![MIT license](https://img.shields.io/badge/license-MIT-brightgreen)
