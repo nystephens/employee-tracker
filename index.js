@@ -106,7 +106,10 @@ function viewAllDepartments() {
 
 function viewAllRoles() {
     connection.query(
-        `SELECT * FROM roles`,
+        `SELECT A.id, A.title, A.salary, B.department_name
+        FROM roles AS A
+        LEFT JOIN departments AS B
+        ON B.id = A.department_id`,
         function (err, results) {
             if (err) throw err;
             console.table(results);
@@ -118,7 +121,10 @@ function viewAllRoles() {
 
 function viewAllEmployees() {
     connection.query(
-        `SELECT * FROM employees `,
+        `SELECT A.* , B.title, B.salary, B.department_id
+        FROM employees AS A
+        LEFT JOIN roles AS B
+        ON B.id = A.role_id`,
         function (err, results) {
             if (err) throw err;
             console.table(results);
