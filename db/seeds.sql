@@ -6,14 +6,12 @@ VALUES
 ("Bakery"),
 ("Deli"),
 ("Grocery"),
-("Frozen"),
-("Produce"),
 ("Checkout");
 
 INSERT INTO roles (title, salary, department_id)
 VALUES
 ("General Manager", 80000.00, 1),
-("Checkout Clerk", 20000.00, 7),
+("Checkout Clerk", 20000.00, 5),
 ("Grocery Crew", 20000.00, NULL),
 ("Baker", 35000.00, 2),
 ("Butcher", 40000.00, 3);

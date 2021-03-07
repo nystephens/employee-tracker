@@ -14,17 +14,6 @@ const connection = mysql.createConnection({
 });
 
 
-// not necessary just for test
-
-function getEmployeeByRoles() {
-    connection.query(
-        'SELECT * FROM `employee` WHERE `role_id` = 6',
-        function (err, results,) {
-            console.table(results); // results contains rows returned by server
-        }
-    );
-};
-
 
 function viewAllDepartments() {
     connection.query(
@@ -51,7 +40,7 @@ function viewAllRoles() {
 
 function viewAllEmployees() {
     connection.query(
-        `SELECT * FROM employees`,
+        `SELECT * FROM employees `,
         function (err, results) {
             if (err) throw err;
             console.table(results);
@@ -127,9 +116,6 @@ function addRole() {
                         function (err, results) {
                             if (err) throw err;
                             console.log("New Role Added");
-
-                            // return user to initial questions.
-                            // promptUser();
                         }
                     );
                 })
@@ -141,7 +127,7 @@ function addRole() {
 function addEmployee() {
     connection.query(
         // grab managerList from employees table
-        `SELECT * FROM employees WHERE manager_id = NULL`,
+        `SELECT * FROM employees WHERE role_id = 1`,
         function (err, results) {
             if (err) throw err;
             let managerList = results.map(manager => ({
@@ -187,7 +173,7 @@ function addEmployee() {
                         // insert new employee answers into table using INSERT INTO 
                         .then(answers => {
                             connection.query(
-                                `INSERT INTO roles SET ?`,
+                                `INSERT INTO employees SET ?`,
                                 {
                                     first_name: answers.empFirstName,
                                     last_name: answers.empLastName,
@@ -208,66 +194,52 @@ function addEmployee() {
 };
 
 
-function updateEmpRole() {
-    // need to grab list of employees to select from.
+const updateEmp = () => {
     connection.query(
-        'SELECT CONCAT(first_name, " ", last_name) as full_name, id FROM employees', function (err, res) {
+        'SELECT CONCAT(employees.first_name, " ",employees.last_name) AS full_name, employees.id as empl_id, roles.* FROM employees RIGHT JOIN roles on employees.role_id = roles.id',
+        function (err, res) {
             if (err) throw err;
-            let empList = res.map(employee => ({
+            let employeeList = res.map(employee => ({
                 full_name: employee.full_name,
-                id: employee.id,
-                value: [employee.full_name, employee.id]
+                id: employee.empl_id,
+                value: [employee.full_name, employee.empl_id]
+            }))
+
+            let roleList = res.map(roles => ({
+                title: roles.title,
+                id: roles.id,
+                value: [roles.title, roles.id]
             }));
 
-            // ask what employee to update using empList
-            inquirer
-                .prompt([
-                    {
-                        type: "list",
-                        name: "empRole",
-                        message: "Please select an employee to update.",
-                        choices: empList
-                    }
-                ])
-                .then(answers => {
-                    connection.query(
-                        // grab roleList from roles table
-                        `SELECT * FROM roles`,
-                        function (err, results) {
-                            if (err) throw err;
+            inquirer.prompt([{
+                type: 'list',
+                name: 'employee',
+                choices: employeeList,
+                message: 'Which employee would you like to edit?'
+            },
+            {
+                type: 'list',
+                name: 'newRole',
+                choices: roleList,
+                message: 'What role do you want to assign to this employee?'
+            }
+            ])
+                .then((answer) => {
+                    let editID = answer.employee[1];
+                    let newRoleId = answer.newRole[1];
+                    connection.query(`UPDATE employees SET role_id=${newRoleId} WHERE id=${editID};`,
+                        function (err, res) {
+                            if (err) {
+                                throw err
+                            }
+                            console.table(res);
+                        })
+                }
 
-                            let roleList = results.map(role => ({
-                                name: role.title, value: role.id
-                            }));
-
-                            // ask questions for new role 
-                            inquirer.prompt([
-                                {
-                                    type: "list",
-                                    name: "empRole",
-                                    message: "Please select the new employee's role.",
-                                    choices: roleList
-                                }
-                            ])
-                                // insert new employee answers into table using INSERT INTO 
-                                .then(answers => {
-                                    connection.query(
-                                        `INSERT INTO roles SET ?`,
-                                        { title: answers.empRole },
-                                        function (err, results) {
-                                            if (err) throw err;
-                                            console.log("New Role Updated!");
-                                            // return user to initial questions.
-                                            moreActions();
-                                        }
-                                    );
-                                })
-                        }
-                    );
-                })
-        }
-    );
+                )
+        })
 };
+
 
 module.exports = {
     viewAllEmployees: viewAllEmployees,
@@ -276,6 +248,6 @@ module.exports = {
     addEmployee: addEmployee,
     addRole: addRole,
     addDepartment: addDepartment,
-    updateEmpRole: updateEmpRole
+    updateEmp: updateEmp
 };
 

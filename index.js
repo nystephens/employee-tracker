@@ -14,11 +14,6 @@ const connection = mysql.createConnection({
     database: 'employee_tracker'
 });
 
-// need to create an employee, department, and role lists by query of sql db.  use lists in inquirer prompt for updateing and adding.
-let employeeList = [];
-let departmentList = [];
-let roleList = [];
-
 
 // Ask the master question in initial prompt.  When user selects and option for veiwing data, fire a SQL query that corresponds with that request. 
 const masterQuestion = [
@@ -30,6 +25,20 @@ const masterQuestion = [
     }
 ];
 
+//function for more actions
+const moreActions = () => {
+    inquirer.prompt([{
+        type: 'confirm',
+        message: 'Would you like to do anything more with your Employee Database?',
+        name: 'moreActions',
+        default: false
+    }]).then(({ moreActions }) => {
+        if (moreActions) {
+            return promptUser();
+        } connection.end();
+    })
+    .catch(err => console.log(err));
+}
 
 // switch statment that has initial options as cases.  each case will contain the appropriate query for viewing table results.  if edit table options selected, then additional questions will fire.
 
@@ -61,7 +70,7 @@ function masterswitch(answers) {
             break;
 
         case "Update Employee Role":
-            db.updateEmpRole();
+            db.updateEmp();
             break;
 
         case "Exit Program":
@@ -88,33 +97,9 @@ function promptUser() {
         .catch(error => console.log(error));
 };
 
-//function for more actions
-const moreActions = () => {
-    inquirer.prompt([{
-        type: 'confirm',
-        message: 'Would you like to do anything more with your Employee Database?',
-        name: 'moreActions',
-        default: false
-    }]).then(({ moreActions }) => {
-        if (moreActions) {
-            return promptUser();
-        } connection.end();
-    })
-    .catch(err => console.log(err));
-}
 
-// let managerList = function () {
-//     connection.query(
-//         `SELECT * FROM employees WHERE role_id <= 5`,
-//         function (err, results){
-//             if (err) throw err;
-//             console.log(results);
-//             return results;
-//         }
-//     );
-// };
 
-// managerList();
+
 promptUser();
 
 
