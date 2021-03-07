@@ -67,6 +67,7 @@ function masterswitch(answers) {
         case "Exit Program":
             // exit program
             console.log("Goodbye!");
+            connection.end();
             break;
 
         default:
@@ -83,10 +84,24 @@ function promptUser() {
         .then(answers => {
             // console.log(answers.masterList);
             masterswitch(answers.masterList);
-            // promptUser();
         })
         .catch(error => console.log(error));
 };
+
+//function for more actions
+const moreActions = () => {
+    inquirer.prompt([{
+        type: 'confirm',
+        message: 'Would you like to do anything more with your Employee Database?',
+        name: 'moreActions',
+        default: false
+    }]).then(({ moreActions }) => {
+        if (moreActions) {
+            return promptUser();
+        } connection.end();
+    })
+    .catch(err => console.log(err));
+}
 
 // let managerList = function () {
 //     connection.query(
@@ -101,3 +116,6 @@ function promptUser() {
 
 // managerList();
 promptUser();
+
+
+module.exports = moreActions;

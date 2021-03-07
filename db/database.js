@@ -1,6 +1,8 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const format = require('console.table');
+const index = require('../index');
+const moreActions = require('../index');
 
 // create the connection to database
 const connection = mysql.createConnection({
@@ -23,23 +25,6 @@ function getEmployeeByRoles() {
     );
 };
 
-// getEmployeeByRoles();
-
-
-// function to create managerList to be used in addEmployee
-let managerList = function () {
-    connection.query(
-        `SELECT * FROM employees WHERE role <= 5`,
-        function (err, results) {
-            if (err) throw err;
-            console.log(results);
-            return results;
-        }
-    );
-};
-
-
-
 
 function viewAllDepartments() {
     connection.query(
@@ -47,6 +32,7 @@ function viewAllDepartments() {
         function (err, results) {
             if (err) throw err;
             console.table(results);
+            // moreActions();
         }
     );
 };
@@ -154,61 +140,69 @@ function addRole() {
 
 function addEmployee() {
     connection.query(
-        // grab roleList from roles table
-        `SELECT * FROM roles`,
+        // grab managerList from employees table
+        `SELECT * FROM employees WHERE manager_id = NULL`,
         function (err, results) {
             if (err) throw err;
-
-            let roleList = results.map(role => ({
-                name: role.title, value: role.id
+            let managerList = results.map(manager => ({
+                name: manager.first_name, value: manager.id
             }));
+            console.log(managerList);
 
-            // grab managerList from employees table
+            connection.query(
+                // grab roleList from roles table
+                `SELECT * FROM roles`,
+                function (err, results) {
+                    if (err) throw err;
 
-            // ask questions for new role 
-            inquirer.prompt([
-                {
-                    type: "input",
-                    name: "empFirstName",
-                    message: "Please enter the new employee's first name:  "
-                },
-                {
-                    type: "input",
-                    name: "empLastName",
-                    message: "Please enter the new employee's last name:  "
-                },
-                {
-                    type: "list",
-                    name: "empRole",
-                    message: "Please slect the new employee's role.",
-                    choices: roleList
-                },
-                {
-                    type: "list",
-                    name: "empManager",
-                    message: "Please select the new employee's manager.",
-                    choices: managerList
-                }
-            ])
-                // insert new employee answers into table using INSERT INTO 
-                .then(answers => {
-                    connection.query(
-                        `INSERT INTO roles SET ?`,
+                    let roleList = results.map(role => ({
+                        name: role.title, value: role.id
+                    }));
+
+                    // ask questions for new role 
+                    inquirer.prompt([
                         {
-                            first_name: answers.empFirstName,
-                            last_name: answers.empLastName,
-                            role_id: answers.empRole,
-                            manager_id: answers.empManager
+                            type: "input",
+                            name: "empFirstName",
+                            message: "Please enter the new employee's first name:  "
                         },
-                        function (err, results) {
-                            if (err) throw err;
-                            console.log("New Employee Added");
-
-                            // return user to initial questions.
-                            // promptUser();
+                        {
+                            type: "input",
+                            name: "empLastName",
+                            message: "Please enter the new employee's last name:  "
+                        },
+                        {
+                            type: "list",
+                            name: "empRole",
+                            message: "Please slect the new employee's role.",
+                            choices: roleList
+                        },
+                        {
+                            type: "list",
+                            name: "empManager",
+                            message: "Please select the new employee's manager.",
+                            choices: managerList
                         }
-                    );
-                })
+                    ])
+                        // insert new employee answers into table using INSERT INTO 
+                        .then(answers => {
+                            connection.query(
+                                `INSERT INTO roles SET ?`,
+                                {
+                                    first_name: answers.empFirstName,
+                                    last_name: answers.empLastName,
+                                    role_id: answers.empRole,
+                                    manager_id: answers.empManager
+                                },
+                                function (err, results) {
+                                    if (err) throw err;
+                                    console.log("New Employee Added");
+
+                                }
+                            );
+                        })
+                }
+            );
         }
     );
 };
@@ -217,26 +211,13 @@ function addEmployee() {
 function updateEmpRole() {
     // need to grab list of employees to select from.
     connection.query(
-        `SELECT CONCAT(first_name, " ", last_name) AS full_name FROM employees`,
-        function (err, results) {
+        'SELECT CONCAT(first_name, " ", last_name) as full_name, id FROM employees', function (err, res) {
             if (err) throw err;
-
-            // creates an array of objects {full_name: 'Fist Last'}
-            let empList = results.map(employee => ({
-                full_name: employee.full_name
+            let empList = res.map(employee => ({
+                full_name: employee.full_name,
+                id: employee.id,
+                value: [employee.full_name, employee.id]
             }));
-
-            // filter to get an array of 
-            // let empFullNames = empList.filter(employee =>{
-            //     employee = employee.full_name;
-            // });
-
-            // // emplist returns an object of {first_name: 'string', last_name: "string"}  Need to get just values and combine them into one string.
-            for (let i = 0; i < empList.length; i++){
-                let empFullNames = empList[i].value;
-                
-            };
-            
 
             // ask what employee to update using empList
             inquirer
@@ -245,7 +226,7 @@ function updateEmpRole() {
                         type: "list",
                         name: "empRole",
                         message: "Please select an employee to update.",
-                        choices: empFullNames
+                        choices: empList
                     }
                 ])
                 .then(answers => {
@@ -272,12 +253,12 @@ function updateEmpRole() {
                                 .then(answers => {
                                     connection.query(
                                         `INSERT INTO roles SET ?`,
-                                        { role_id: answers.empRole },
+                                        { title: answers.empRole },
                                         function (err, results) {
                                             if (err) throw err;
                                             console.log("New Role Updated!");
                                             // return user to initial questions.
-                                            // promptUser();
+                                            moreActions();
                                         }
                                     );
                                 })
